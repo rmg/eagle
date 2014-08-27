@@ -1,0 +1,10 @@
+{
+	"ImportPath": "github.com/rmg/eagle",
+	"GoVersion": "go1.3",
+	"Deps": [
+		{
+			"ImportPath": "github.com/rmg/iso4217",
+			"Rev": "529186405d217c4a180c421af10b308a360f030e"
+		}
+	]
+}

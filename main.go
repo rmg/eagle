@@ -4,11 +4,11 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"github.com/rmg/eagle"
+	"github.com/rmg/eagle/server"
 )
 
 func main() {
-	http.HandleFunc("/metrics", eagle.MetricsHandler)
+	http.HandleFunc("/metrics", server.MetricsHandler)
 	err := http.ListenAndServe(portOrDefault("8000"), nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

@@ -1,4 +1,4 @@
-package eagle
+package server
 
 import (
 	"encoding/hex"

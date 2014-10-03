@@ -1,0 +1,3 @@
+FROM golang:onbuild
+ENV PORT 8000
+EXPOSE 8000

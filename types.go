@@ -13,7 +13,7 @@ import (
 type HexInt int64
 
 func (i *HexInt) UnmarshalText(b []byte) error {
-	newInt, err := strconv.ParseInt(string(b), 16, 64)
+	newInt, err := strconv.ParseInt(string(b), 0, 64)
 	*i = HexInt(newInt)
 	return err
 }

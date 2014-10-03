@@ -177,9 +177,8 @@ func (p PriceCluster) String() string {
 	div := int(math.Pow10(int(p.PriceCluster.TrailingDigits)))
 	if div == 1 {
 		return fmt.Sprintf("%d %s", price, name)
-	} else {
-		return fmt.Sprintf("%d.%d %s", price/div, price%div, name)
 	}
+	return fmt.Sprintf("%d.%d %s", price/div, price%div, name)
 }
 
 func (p PriceCluster) Int() int {

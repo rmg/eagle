@@ -6,9 +6,40 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 )
+
+func graphiteMetric(name string, value int) {
+	strTpl := "%s.%s %d\n"
+	apiKey := os.Getenv("HOSTEDGRAPHITE_APIKEY")
+	datum := fmt.Sprintf(strTpl, apiKey, name, value)
+	conn, _ := net.Dial("udp", "carbon.hostedgraphite.com:2003")
+	defer conn.Close()
+	conn.Write([]byte(datum))
+}
+
+func forwardMetric(name string, value int) {
+	url := "http://sandbox.influxdb.com:8086/db/eagle/series?u=rmg&p=GpqW1DtL3Png"
+	jsonTpl := "[{ \"name\": \"%s\", \"columns\": [\"value\"], \"points\": [[%d]] }]"
+	jsonStr := fmt.Sprintf(jsonTpl, name, value)
+
+	req, _ := http.NewRequest("POST", url, strings.NewReader(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+
+	// fmt.Println("request Body:", jsonStr)
+	// fmt.Println("response Status:", resp.Status)
+	// fmt.Println("response Headers:", resp.Header)
+	// body, _ := ioutil.ReadAll(resp.Body)
+	// fmt.Println("response Body:", string(body))
+}
 
 func MetricsHandler(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
@@ -77,7 +108,9 @@ func ReceiveDemand(w http.ResponseWriter, req *http.Request, body []byte) {
 	} else {
 		result := Reading{time.Now(), demand.Int(), metrics[len(metrics)-1].Price}
 		log.Printf("InstantaneousDemand: %+v", result)
-		metrics = append(metrics, result)
+		forwardMetric("demand", demand.Int())
+		graphiteMetric("demand", demand.Int())
+		// metrics = append(metrics, result)
 	}
 }
 
@@ -90,6 +123,8 @@ func ReceivePrice(w http.ResponseWriter, req *http.Request, body []byte) {
 	} else {
 		result := Reading{time.Now(), metrics[len(metrics)-1].Demand, price.Int()}
 		log.Printf("PriceCluster: %+v", result)
-		metrics = append(metrics, result)
+		forwardMetric("price", price.Int())
+		graphiteMetric("price", price.Int())
+		// metrics = append(metrics, result)
 	}
 }

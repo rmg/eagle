@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/rmg/eagle/server"
 	"log"
 	"net/http"
 	"os"
-	"github.com/rmg/eagle/server"
 )
 
 func main() {

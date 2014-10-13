@@ -14,8 +14,11 @@ import (
 )
 
 func graphiteMetric(name string, value int) {
-	strTpl := "%s.%s %d\n"
 	apiKey := os.Getenv("HOSTEDGRAPHITE_APIKEY")
+	if len(apiKey) < 1 {
+		return
+	}
+	strTpl := "%s.%s %d\n"
 	datum := fmt.Sprintf(strTpl, apiKey, name, value)
 	conn, _ := net.Dial("udp", "carbon.hostedgraphite.com:2003")
 	defer conn.Close()
@@ -23,7 +26,10 @@ func graphiteMetric(name string, value int) {
 }
 
 func forwardMetric(name string, value int) {
-	url := "http://sandbox.influxdb.com:8086/db/eagle/series?u=rmg&p=GpqW1DtL3Png"
+	url := os.Getenv("INFLUXDB_URL")
+	if len(url) < 1 {
+		return
+	}
 	jsonTpl := "[{ \"name\": \"%s\", \"columns\": [\"value\"], \"points\": [[%d]] }]"
 	jsonStr := fmt.Sprintf(jsonTpl, name, value)
 
